@@ -21,7 +21,7 @@ const schema = new mongoose.Schema({
     type: Date,
     select: false,
   },
-  services: [{ type: String, ref: "Service" }],
+  services: { type: [{ type: String, ref: "Service" }], select: false },
 });
 
 const Model = mongoose.model("Job", schema);

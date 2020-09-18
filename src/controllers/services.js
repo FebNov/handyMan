@@ -1,5 +1,5 @@
 const ServiceModel = require("../models/service");
-
+const JobModel = require("../models/job");
 async function addService(req, res) {
   const { code, serviceName, description } = req.body;
   const existService = await ServiceModel.findById(code).exec();
@@ -13,7 +13,9 @@ async function addService(req, res) {
 
 async function getService(req, res) {
   const { id: code } = req.params;
-  const service = await ServiceModel.findById(code).exec();
+  const service = await ServiceModel.findById(code)
+    .populate("jobs", "jobName visible")
+    .exec();
   if (!service) {
     return res.status(404).json("Service Not Found");
   }
@@ -48,6 +50,15 @@ async function deleteService(req, res) {
   if (!service) {
     return res.status(404).json("service Not Found");
   }
+
+  await JobModel.updateMany(
+    { services: service._id },
+    {
+      $pull: {
+        services: service._id,
+      },
+    }
+  ).exec();
   return res.sendStatus(204);
 }
 

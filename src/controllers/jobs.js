@@ -9,7 +9,9 @@ async function getAllJobs(req, res) {
 
 async function getJob(req, res) {
   const { id } = req.params;
-  const job = await JobModel.findById(id).populate("services").select().exec();
+  const job = await JobModel.findById(id)
+    .populate("services", "_id serviceName description")
+    .exec();
   if (!job) {
     return res.status(404).json("job Not Found");
   }
@@ -29,10 +31,14 @@ async function addJob(req, res) {
 
 async function deleteJob(req, res) {
   const { id } = req.params;
-  const student = await JobModel.findByIdAndDelete(id);
-  if (!student) {
-    return res.status(404).json("student not found");
+  const job = await JobModel.findByIdAndDelete(id);
+  if (!job) {
+    return res.status(404).json("job not found");
   }
+  await ServiceModel.updateMany(
+    { jobs: job._id },
+    { $pull: { jobs: job._id } }
+  ).exec();
   return res.sendStatus(200);
 }
 
@@ -55,8 +61,12 @@ async function updateJob(req, res) {
 async function linkJobToService(req, res) {
   // service id , job id get ,
   const { id, code } = req.params;
-  const job = await JobModel.findById(id).exec();
-  const service = await ServiceModel.findById(code).exec();
+  const job = await JobModel.findById(id)
+    .select("services jobName description")
+    .exec();
+  const service = await ServiceModel.findById(code)
+    .select("jobs serviceName description")
+    .exec();
   if (!job || !service) {
     return res.status(404).json("Job or Service Not Found");
   }
@@ -68,8 +78,8 @@ async function linkJobToService(req, res) {
 }
 async function removeJobFromService(req, res) {
   const { id, code } = req.params;
-  const job = await JobModel.findById(id).exec();
-  const service = await ServiceModel.findById(code).exec();
+  const job = await JobModel.findById(id).select("services jobName").exec();
+  const service = await ServiceModel.findById(code).select("jobs").exec();
   if (!job || !service) {
     return res.status(404).json("Job or Service Not Found");
   }
@@ -84,7 +94,7 @@ async function removeJobFromService(req, res) {
   await job.save();
   await service.save();
 
-  return res.json(student);
+  return res.json(job);
 }
 module.exports = {
   getAllJobs,
