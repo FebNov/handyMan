@@ -1,4 +1,6 @@
 const JobModel = require("../models/job");
+const ServiceModel = require("../models/service");
+const services = require("./services");
 
 async function getAllJobs(req, res) {
   const job = await JobModel.find().exec();
@@ -7,7 +9,7 @@ async function getAllJobs(req, res) {
 
 async function getJob(req, res) {
   const { id } = req.params;
-  const job = await JobModel.findById(id).exec();
+  const job = await JobModel.findById(id).populate("services").select().exec();
   if (!job) {
     return res.status(404).json("job Not Found");
   }
@@ -50,14 +52,46 @@ async function updateJob(req, res) {
   return res.json(job);
 }
 
-async function addJobToJob(req, res) {}
-async function removeJobFromJob(req, res) {}
+async function linkJobToService(req, res) {
+  // service id , job id get ,
+  const { id, code } = req.params;
+  const job = await JobModel.findById(id).exec();
+  const service = await ServiceModel.findById(code).exec();
+  if (!job || !service) {
+    return res.status(404).json("Job or Service Not Found");
+  }
+  job.services.addToSet(service._id);
+  //   service.job.addToSet(job._id);
+  await job.save();
+  await service.save();
+  return res.json(job);
+}
+async function removeJobFromService(req, res) {
+  const { id, code } = req.params;
+  const job = await JobModel.findById(id).exec();
+  const service = await ServiceModel.findById(code).exec();
+  if (!job || !service) {
+    return res.status(404).json("Job or Service Not Found");
+  }
+  const oldLength = job.services.length;
+  //TO Fix pull
+  job.sevices.pull(service._id);
+
+  if (job.sevices.length === oldLength) {
+    return res.status(404).json("Does not exist");
+  }
+  //   service.jobs.pull(job._id);
+  await job.save();
+  await service.save();
+
+  return res.json(student);
+}
 module.exports = {
   getAllJobs,
   getJob,
   addJob,
   deleteJob,
   updateJob,
-  addJobToJob,
-  removeJobFromJob,
+  linkJobToService,
+  removeJobFromService,
 };

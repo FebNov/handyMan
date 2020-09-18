@@ -25,6 +25,7 @@ const schema = new mongoose.Schema(
     //   },
     __v: { type: Number, select: false },
     createdAt: { type: Date, select: false },
+    jobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
   },
   {
     timestamps: true, // show timestamp
@@ -33,7 +34,6 @@ const schema = new mongoose.Schema(
     },
     id: false, // hide `id` virtual property
   }
-  
 );
 
 const Model = mongoose.model("Service", schema);

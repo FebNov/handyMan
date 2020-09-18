@@ -5,8 +5,8 @@ const {
   addJob,
   deleteJob,
   updateJob,
-  //   addJobToJob,
-  //   removeJobFromJob,
+  linkJobToService,
+  removeJobFromService,
 } = require("../controllers/jobs");
 const router = express.Router();
 
@@ -15,6 +15,6 @@ router.get("/:id", getJob);
 router.post("/", addJob);
 router.put("/:id", updateJob);
 router.delete("/:id", deleteJob);
-// router.post("/:id/jobs/:", addJobToJob);
-// router.delete("/:id", removeJobFromJob);
+router.post("/:id/services/:code", linkJobToService);
+router.delete("/:id/services/:code", removeJobFromService);
 module.exports = router;
