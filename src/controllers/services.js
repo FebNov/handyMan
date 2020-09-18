@@ -2,7 +2,10 @@ const ServiceModel = require("../models/service");
 
 async function addService(req, res) {
   const { code, serviceName, description } = req.body;
-
+  const existService = await ServiceModel.findById(code).exec();
+  if (existService) {
+    return res.status(409).json("Already Existed");
+  }
   const service = new ServiceModel({ code, serviceName, description });
   await service.save();
   return res.status(201).json(service);
