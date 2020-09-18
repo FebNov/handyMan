@@ -1,9 +1,9 @@
 const ServiceModel = require("../models/service");
 
 async function addService(req, res) {
-  // const { code, serviceName, description } = req.body;
+  const { code, serviceName, description } = req.body;
 
-  const service = new ServiceModel({ code: "AsSS1", serviceName: "sassss" });
+  const service = new ServiceModel({ code, serviceName, description });
   await service.save();
   return res.status(201).json(service);
 }
