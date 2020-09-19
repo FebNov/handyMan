@@ -71,11 +71,15 @@ async function linkJobToService(req, res) {
     return res.status(404).json("Job or Service Not Found");
   }
   job.services.addToSet(service._id);
-  //   service.job.addToSet(job._id);
+  service.job.addToSet(job._id);
   await job.save();
   await service.save();
   return res.json(job);
 }
+
+//1 v 1
+// service 下面可以有很多个job
+//job 下面只有1个service
 async function removeJobFromService(req, res) {
   const { id, code } = req.params;
   const job = await JobModel.findById(id).select("services jobName").exec();
@@ -84,13 +88,16 @@ async function removeJobFromService(req, res) {
     return res.status(404).json("Job or Service Not Found");
   }
   const oldLength = job.services.length;
-  //TO Fix pull
-  job.sevices.pull(service._id);
 
-  if (job.sevices.length === oldLength) {
+  // console.log(job);
+  // console.log(job.services);
+  // console.log(service._id);
+  job.services.pull(service._id);
+
+  if (job.services.length === oldLength) {
     return res.status(404).json("Does not exist");
   }
-  //   service.jobs.pull(job._id);
+  service.jobs.pull(job._id);
   await job.save();
   await service.save();
 
