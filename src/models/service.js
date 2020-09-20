@@ -27,7 +27,7 @@ const schema = new mongoose.Schema(
     createdAt: { type: Date, select: false },
     jobs: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
-      select: false,
+      select: true,
     },
   },
   {

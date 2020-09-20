@@ -70,11 +70,37 @@ async function linkJobToService(req, res) {
   if (!job || !service) {
     return res.status(404).json("Job or Service Not Found");
   }
-  job.services.addToSet(service._id);
-  service.job.addToSet(job._id);
-  await job.save();
-  await service.save();
-  return res.json(job);
+  if (job.services.length == 0) {
+    job.services.addToSet(service._id);
+    // console.log(service._id);
+    // console.log(job._id);
+    service.jobs.addToSet(job._id);
+    await job.save();
+    await service.save();
+    console.log("link successful beteween job and service");
+    return res.json(job);
+  } // 相同job关联别的service  // To Ask 再 service.jobs 更改select 的值会影响到取它么？
+  else {
+    const copyItem = job.services.slice();
+    // console.log(copyItem); //[1]
+    const jobServicesExistedItem = copyItem[0];
+    // console.log(jobServicesExistedItem); //1   == service._id
+    const preService = await ServiceModel.findById(
+      jobServicesExistedItem
+    ).exec();
+    // console.log(preService);
+    // console.log(preService.jobs); //找到之前关联的service信息
+    // console.log(job._id);
+    preService.jobs.pull(job._id); //取消之前service的关联
+    await preService.save();
+    job.services.pop();
+    job.services.addToSet(service._id);
+    service.jobs.addToSet(job._id);
+    await job.save();
+    await service.save();
+    console.log("Update Link");
+    return res.json(job);
+  }
 }
 
 //1 v 1
@@ -88,12 +114,7 @@ async function removeJobFromService(req, res) {
     return res.status(404).json("Job or Service Not Found");
   }
   const oldLength = job.services.length;
-
-  // console.log(job);
-  // console.log(job.services);
-  // console.log(service._id);
   job.services.pull(service._id);
-
   if (job.services.length === oldLength) {
     return res.status(404).json("Does not exist");
   }
