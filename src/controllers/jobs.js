@@ -85,9 +85,9 @@ async function linkJobToService(req, res) {
     // console.log(copyItem); //[1]
     const jobServicesExistedItem = copyItem[0];
     // console.log(jobServicesExistedItem); //1   == service._id
-    const preService = await ServiceModel.findById(
-      jobServicesExistedItem
-    ).exec();
+    const preService = await ServiceModel.findById(jobServicesExistedItem)
+      .select("jobs")
+      .exec();
     // console.log(preService);
     // console.log(preService.jobs); //找到之前关联的service信息
     // console.log(job._id);
