@@ -3,8 +3,9 @@ const router = express.Router();
 const serviceRoute = require("./routes/services");
 const jobRoute = require("./routes/jobs");
 const userRoute = require("./routes/users");
-
+const customerRoute = require("./routes/customers");
 router.use("/services", serviceRoute);
 router.use("/jobs", jobRoute);
 router.use("/users", userRoute);
+router.use("/customers", customerRoute);
 module.exports = router;

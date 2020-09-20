@@ -5,7 +5,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  WorkTime: {
+  workTime: {
     type: Boolean,
     required: true,
     default: true,
