@@ -14,10 +14,6 @@ const schema = new mongoose.Schema({
     type: String,
     default: "firstName ",
   },
-  createdAt: {
-    type: Date,
-    select: false,
-  },
   users: { type: [{ type: String, ref: "User" }], select: false },
 });
 
