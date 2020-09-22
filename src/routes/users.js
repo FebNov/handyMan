@@ -5,8 +5,8 @@ const {
   addUser,
   deleteUser,
   updateUser,
-//   linkUserToService,
-//   removeUserFromService,
+  addUserTOCustomers,
+  addUserTOTradies,
 } = require("../controllers/users");
 const router = express.Router();
 
@@ -16,5 +16,6 @@ router.post("/", addUser);
 router.put("/:id", updateUser);
 router.delete("/:id", deleteUser);
 // router.post("/:id/services/:code", linkJobToService);
-// router.delete("/:id/services/:code", removeJobFromService);
+router.post("/:id/customers/:code", addUserTOCustomers);
+router.post("/:id/tradies/:code", addUserTOTradies);
 module.exports = router;

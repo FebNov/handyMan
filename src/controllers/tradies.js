@@ -7,9 +7,9 @@ async function getAllTradies(req, res) {
 }
 
 async function getTradie(req, res) {
-  const { id } = req.params;
-  const tradie = await TradieModel.findById(id)
-    // .populate("services", "_id serviceName description")
+  const { id: tradieId } = req.params;
+  const tradie = await TradieModel.findById(tradieId)
+    .populate("users", "_id firstName lastName")
     .exec();
   if (!tradie) {
     return res.status(404).json("tradie Not Found");
@@ -18,19 +18,23 @@ async function getTradie(req, res) {
 }
 
 async function addTradie(req, res) {
-  const { _id, workTime } = req.body;
+  const { tradieId, workTime } = req.body;
+  const existTradie = await TradieModel.findById(tradieId).exec();
+  if (existTradie) {
+    return res.status(409).json("Already Existed");
+  }
   const tradie = new TradieModel({
-    email,
-    _id,
+    tradieId,
     workTime,
   });
+
   await tradie.save();
   return res.status(201).json(tradie);
 }
 
 async function deleteTradie(req, res) {
-  const { id } = req.params;
-  const tradie = await TradieModel.findByIdAndDelete(id);
+  const { id: tradieId } = req.params;
+  const tradie = await TradieModel.findByIdAndDelete(tradieId);
   if (!tradie) {
     return res.status(404).json("tradie not found");
   }
@@ -43,11 +47,11 @@ async function deleteTradie(req, res) {
 }
 
 async function updateTradie(req, res) {
-  const { id } = req.params;
-  const { _id, workTime } = req.body;
+  const { id: tradieId } = req.params;
+  const { workTime } = req.body;
   const tradie = await TradieModel.findByIdAndUpdate(
-    id,
-    { _id, workTime },
+    tradieId,
+    { workTime },
     { new: true }
   ).exec();
 

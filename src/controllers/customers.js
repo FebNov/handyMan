@@ -7,9 +7,9 @@ async function getAllCustomers(req, res) {
 }
 
 async function getCustomer(req, res) {
-  const { id } = req.params;
-  const customer = await CustomerModel.findById(id)
-    // .populate("services", "_id serviceName description")
+  const { id: customerId } = req.params;
+  const customer = await CustomerModel.findById(customerId)
+    .populate("users", "_id firstName lastName")
     .exec();
   if (!customer) {
     return res.status(404).json("customer Not Found");
@@ -18,10 +18,14 @@ async function getCustomer(req, res) {
 }
 
 async function addCustomer(req, res) {
-  const { _id, ContactNo } = req.body;
+  const { customerId, ContactNo, address } = req.body;
+  const existCustomer = await CustomerModel.findById(customerId).exec();
+  if (existCustomer) {
+    return res.status(409).json("Already Existed");
+  }
   const user = new CustomerModel({
-    email,
-    _id,
+    address,
+    customerId,
     ContactNo,
   });
   await user.save();
@@ -29,8 +33,8 @@ async function addCustomer(req, res) {
 }
 
 async function deleteCustomer(req, res) {
-  const { id } = req.params;
-  const customer = await CustomerModel.findByIdAndDelete(id);
+  const { id: customerId } = req.params;
+  const customer = await CustomerModel.findByIdAndDelete(customerId);
   if (!customer) {
     return res.status(404).json("customer not found");
   }
@@ -43,11 +47,11 @@ async function deleteCustomer(req, res) {
 }
 
 async function updateCustomer(req, res) {
-  const { id } = req.params;
-  const { _id, ContactNo } = req.body;
+  const { id: customerId } = req.params;
+  const { ContactNo, address } = req.body;
   const customer = await CustomerModel.findByIdAndUpdate(
-    id,
-    { _id, ContactNo },
+    customerId,
+    { ContactNo, address },
     { new: true }
   ).exec();
 
