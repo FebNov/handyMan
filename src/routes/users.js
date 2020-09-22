@@ -7,6 +7,8 @@ const {
   updateUser,
   addUserTOCustomers,
   addUserTOTradies,
+  notCustomer,
+  notTradie,
 } = require("../controllers/users");
 const router = express.Router();
 
@@ -18,4 +20,6 @@ router.delete("/:id", deleteUser);
 // router.post("/:id/services/:code", linkJobToService);
 router.post("/:id/customers/:code", addUserTOCustomers);
 router.post("/:id/tradies/:code", addUserTOTradies);
+router.delete("/:id/customers/:code", notCustomer);
+router.delete("/:id/tradies/:code", notTradie);
 module.exports = router;

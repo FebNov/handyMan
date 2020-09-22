@@ -38,11 +38,11 @@ async function deleteCustomer(req, res) {
   if (!customer) {
     return res.status(404).json("customer not found");
   }
-  //TO DO
-  // await ServiceModel.updateMany(
-  //   { jobs: job._id },
-  //   { $pull: { jobs: job._id } }
-  // ).exec();
+
+  await UserModel.updateMany(
+    { customers: customer._id },
+    { $pull: { customers: customer._id } }
+  ).exec();
   return res.sendStatus(200);
 }
 

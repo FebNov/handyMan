@@ -38,11 +38,11 @@ async function deleteTradie(req, res) {
   if (!tradie) {
     return res.status(404).json("tradie not found");
   }
-  //TO DO
-  // await ServiceModel.updateMany(
-  //   { jobs: job._id },
-  //   { $pull: { jobs: job._id } }
-  // ).exec();
+
+  await UserModel.updateMany(
+    { tradies: tradie._id },
+    { $pull: { tradies: tradie._id } }
+  ).exec();
   return res.sendStatus(200);
 }
 
