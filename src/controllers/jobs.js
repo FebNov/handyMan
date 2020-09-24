@@ -30,17 +30,33 @@ async function addJob(req, res) {
   return res.status(201).json(job);
 }
 
+// async function deleteJob(req, res) {
+//   const { id } = req.params;
+//   const job = await JobModel.findByIdAndDelete(id);
+//   if (!job) {
+//     return res.status(404).json("job not found");
+//   }
+//   await ServiceModel.updateMany(
+//     { jobs: job._id },
+//     { $pull: { jobs: job._id } }
+//   ).exec();
+//   return res.sendStatus(200);
+// }
+
 async function deleteJob(req, res) {
   const { id } = req.params;
-  const job = await JobModel.findByIdAndDelete(id);
-  if (!job) {
-    return res.status(404).json("job not found");
-  }
-  await ServiceModel.updateMany(
-    { jobs: job._id },
-    { $pull: { jobs: job._id } }
+  const { visible } = req.body;
+  const job = await JobModel.findByIdAndUpdate(
+    id,
+    { visible },
+    { new: true }
   ).exec();
-  return res.sendStatus(200);
+
+  if (!job) {
+    return res.status(404).json("Job Not Found");
+  }
+  await job.save();
+  return res.json(job);
 }
 
 async function updateJob(req, res) {
