@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+//TO DO 和tradie 互相关联
 const schema = new mongoose.Schema({
   jobName: {
     type: String,
@@ -23,6 +23,7 @@ const schema = new mongoose.Schema({
     select: false,
   },
   services: { type: [{ type: String, ref: "Service" }], select: false },
+  tradies: { type: [{ type: String, ref: "Tradie" }], select: false },
 });
 
 const Model = mongoose.model("Job", schema);

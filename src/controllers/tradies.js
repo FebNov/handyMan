@@ -1,5 +1,6 @@
 const UserModel = require("../models/user");
 const TradieModel = require("../models/tradie");
+const JobModel = require("../models/job");
 
 async function getAllTradies(req, res) {
   const tradie = await TradieModel.find().exec();
@@ -61,11 +62,51 @@ async function updateTradie(req, res) {
   await tradie.save();
   return res.json(tradie);
 }
+//1个tradie有很多job，job只分配给1个tradie
+async function addJobForTradie(req, res) {
+  const { id, code } = req.params;
 
+  const tradie = await TradieModel.findById(id)
+    .select("tradieId jobs workTime")
+    .exec();
+  const job = await JobModel.findById(code)
+    .select("tradies jobName description")
+    .exec();
+  if (!job || !tradie) {
+    return res.status(404).json("Job or Tradie Not Found");
+  }
+  if (job.tradies.length == 0) {
+    job.tradies.addToSet(tradie._id);
+
+    tradie.jobs.addToSet(job._id);
+    await job.save();
+    await tradie.save();
+    console.log("link successful beteween job and tradie");
+    return res.json(tradie);
+  } else {
+    const copyItem = job.tradies.slice();
+
+    const jobTradieesExistedItem = copyItem[0];
+
+    const preTradie = await TradieModel.findById(jobTradieesExistedItem)
+      .select("jobs")
+      .exec();
+    preTradie.jobs.pull(job._id);
+    await preTradie.save();
+    job.tradies.pop();
+    job.tradies.addToSet(tradie._id);
+    tradie.jobs.addToSet(job._id);
+    await job.save();
+    await tradie.save();
+    console.log("Update Link");
+    return res.json(tradie);
+  }
+}
 module.exports = {
   getAllTradies,
   getTradie,
   addTradie,
   deleteTradie,
   updateTradie,
+  addJobForTradie,
 };
