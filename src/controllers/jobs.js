@@ -11,6 +11,7 @@ async function getJob(req, res) {
   const { id } = req.params;
   const job = await JobModel.findById(id)
     .populate("services", "_id serviceName description")
+    .populate("tradies", "tradieId")
     .exec();
   if (!job) {
     return res.status(404).json("job Not Found");
