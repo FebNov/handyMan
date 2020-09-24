@@ -30,27 +30,22 @@ async function addJob(req, res) {
   return res.status(201).json(job);
 }
 
-// async function deleteJob(req, res) {
-//   const { id } = req.params;
-//   const job = await JobModel.findByIdAndDelete(id);
-//   if (!job) {
-//     return res.status(404).json("job not found");
-//   }
-//   await ServiceModel.updateMany(
-//     { jobs: job._id },
-//     { $pull: { jobs: job._id } }
-//   ).exec();
-//   return res.sendStatus(200);
-// }
+async function superDeleteJob(req, res) {
+  const { id } = req.params;
+  const job = await JobModel.findByIdAndDelete(id);
+  if (!job) {
+    return res.status(404).json("job not found");
+  }
+  await ServiceModel.updateMany(
+    { jobs: job._id },
+    { $pull: { jobs: job._id } }
+  ).exec();
+  return res.sendStatus(200);
+}
 
 async function deleteJob(req, res) {
   const { id } = req.params;
-  const { visible } = req.body;
-  const job = await JobModel.findByIdAndUpdate(
-    id,
-    { visible },
-    { new: true }
-  ).exec();
+  const job = await JobModel.findByIdAndUpdate(id, { visible: false }).exec();
 
   if (!job) {
     return res.status(404).json("Job Not Found");
@@ -58,15 +53,22 @@ async function deleteJob(req, res) {
   await job.save();
   return res.json(job);
 }
-
+async function reNewJob(req, res) {
+  const { id } = req.params;
+  const job = await JobModel.findByIdAndReNew(id, { visible: true }).exec();
+  if (!job) {
+    return res.status(404).json("Job Not Found");
+  }
+  await job.save();
+  return res.json(job);
+}
 async function updateJob(req, res) {
   const { id } = req.params;
-  const { jobName, visible, description } = req.body;
-  const job = await JobModel.findByIdAndUpdate(
-    id,
-    { jobName, visible, description },
-    { new: true }
-  ).exec();
+  const { jobName, description } = req.body;
+  const job = await JobModel.findByIdAndUpdate(id, {
+    jobName,
+    description,
+  }).exec();
 
   if (!job) {
     return res.status(404).json("Job Not Found");
@@ -146,7 +148,9 @@ module.exports = {
   getJob,
   addJob,
   deleteJob,
+  reNewJob,
   updateJob,
   linkJobToService,
+  superDeleteJob,
   removeJobFromService,
 };

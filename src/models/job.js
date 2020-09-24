@@ -7,7 +7,6 @@ const schema = new mongoose.Schema({
   },
   visible: {
     type: Boolean,
-    required: true,
     default: true,
   },
   description: {
