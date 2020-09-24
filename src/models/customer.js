@@ -21,6 +21,14 @@ const schema = new mongoose.Schema(
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
       select: false,
     },
+    orders: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
+      select: false,
+    },
+    inquiries: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Inquiry" }],
+      select: false,
+    },
   },
   {
     timestamps: true, // show timestamp
